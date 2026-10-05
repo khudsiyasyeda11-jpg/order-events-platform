@@ -1,0 +1,9 @@
+# Production-like profile: JSON (ECS) structured logs to stdout for log shippers
+# such as Fluent Bit / CloudWatch / OpenSearch. MDC values (correlationId) are included.
+logging:
+  structured:
+    format:
+      console: ecs
+springdoc:
+  swagger-ui:
+    enabled: ${SWAGGER_UI_ENABLED:false}

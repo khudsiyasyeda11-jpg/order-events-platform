@@ -1,0 +1,58 @@
+spring:
+  application:
+    name: notification-service
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/notifications}
+    username: ${DB_USERNAME:notifications}
+    password: ${DB_PASSWORD:}
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:5}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: ${CONSUMER_GROUP_ID:notification-service}
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        isolation.level: read_committed
+    producer:
+      # Used by the dead-letter publisher; payloads are forwarded verbatim.
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+    listener:
+      ack-mode: record
+      concurrency: ${LISTENER_CONCURRENCY:3}
+
+server:
+  port: ${SERVER_PORT:8081}
+  shutdown: graceful
+
+app:
+  kafka:
+    topics:
+      order-created: ${ORDER_CREATED_TOPIC:orders.order-created.v1}
+      order-created-dlt: ${ORDER_CREATED_DLT_TOPIC:orders.order-created.v1.dlt}
+      partitions: ${ORDER_CREATED_PARTITIONS:3}
+      replicas: ${ORDER_CREATED_REPLICAS:1}
+    retry:
+      interval-ms: ${RETRY_INTERVAL_MS:1000}
+      max-retries: ${RETRY_MAX_RETRIES:3}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+
+logging:
+  pattern:
+    correlation: "[%X{eventId:-}] "
+  level:
+    com.portfolio: INFO

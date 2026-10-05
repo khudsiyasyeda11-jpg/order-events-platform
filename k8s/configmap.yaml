@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: order-events-config
+  namespace: order-events
+  labels:
+    app.kubernetes.io/part-of: order-events-platform
+data:
+  SPRING_PROFILES_ACTIVE: "prod"
+  # e.g. Amazon MSK bootstrap brokers (TLS listener) or an in-cluster Kafka service
+  KAFKA_BOOTSTRAP_SERVERS: "kafka-bootstrap.kafka.svc.cluster.local:9092"
+  ORDER_CREATED_TOPIC: "orders.order-created.v1"
+  ORDER_CREATED_DLT_TOPIC: "orders.order-created.v1.dlt"
+  ORDER_CREATED_PARTITIONS: "6"
+  ORDER_CREATED_REPLICAS: "3"
+  ORDERS_DB_URL: "jdbc:postgresql://orders-db.example.internal:5432/orders"
+  NOTIFICATIONS_DB_URL: "jdbc:postgresql://orders-db.example.internal:5432/notifications"
